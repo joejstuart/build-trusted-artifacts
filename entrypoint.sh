@@ -35,20 +35,20 @@ time_format=''
 log() {
     :
 }
-if [[ -v DEBUG ]]; then
-    iostat -d 1 &
-    IOSTAT_PID=$!
-    trap 'kill ${IOSTAT_PID}' EXIT
-    time_format='User:\t\t%U\nSystem:\t\t%S\nElapsed:\t%E\nCPU:\t\t%P\nMax RS:\t\t%MKiB\nAVG Memory:\t%KKiB\nInputs:\t\t%I\nOutputs:\t%O\nWaits:\t\t%w\n'
-    log() {
-        # shellcheck disable=SC2059
-        printf "DEBUG: %s\n" "$(printf "${@}")"
-    }
-
-    log "running as %s" "$(id)"
-    export PS4='DEBUG $0.$LINENO: '
-    set -o xtrace
-fi
+#if [[ -v DEBUG ]]; then
+#    iostat -d 1 &
+#    IOSTAT_PID=$!
+#    trap 'kill ${IOSTAT_PID}' EXIT
+#    time_format='User:\t\t%U\nSystem:\t\t%S\nElapsed:\t%E\nCPU:\t\t%P\nMax RS:\t\t%MKiB\nAVG Memory:\t%KKiB\nInputs:\t\t%I\nOutputs:\t%O\nWaits:\t\t%w\n'
+#    log() {
+#        # shellcheck disable=SC2059
+#        printf "DEBUG: %s\n" "$(printf "${@}")"
+#    }
+#
+#    log "running as %s" "$(id)"
+#    export PS4='DEBUG $0.$LINENO: '
+#    set -o xtrace
+#fi
 export -f log
 
 if [[ $# -eq 0 ]]; then
@@ -74,26 +74,12 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-# The `--store`` was not provided, use first available workspace.
-if [ -z "${store}" ]; then
-    workspaces=(/workspace/*)
-    for w in "${workspaces[@]}"; do
-        if [ -d "${w}" ]; then
-            store="${w}"
-            echo "Using ${store} for artifact storage, provide --store <path> to customize"
-            break
-        fi
-    done
-fi
-
-if [ ! -d "${store}" ]; then
-    echo "Unable to use artifact store: ${store}, the provided path is either missing or not a directory"
-    exit 1
-fi
-
 case "${op}" in
     "create")
         TIME="${time_format}" time /usr/local/bin/create-archive --store "${store}" "${cmd[@]}"
+        ;;
+    "create-oci")
+        TIME="${time_format}" time /usr/local/bin/create-oci-archive --store "${store}" "${cmd[@]}"
         ;;
     "use")
         TIME="${time_format}" time /usr/local/bin/use-archive --store "${store}" "${cmd[@]}"

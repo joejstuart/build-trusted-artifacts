@@ -100,3 +100,9 @@ directory; install Tekton Pipelines and run a Pipeline with `git-clone` and
 
 Have a look in the `hack/kustomization.yaml` to see how the Tasks ware modified
 so that they use trusted artifacts.
+
+### Running from a container
+```bash
+podman build . -t quay.io/my-org/build-trusted-artifacts
+podman run -v ~/.docker/config.json:/home/notroot/.docker/config.json:ro -it quay.io/my-org/build-trusted-artifacts create-oci --store quay.io/my-org/trusted-artifacts bundles=/tmp
+```

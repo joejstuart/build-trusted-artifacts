@@ -1,4 +1,4 @@
-#!/opt/homebrew/bin/bash
+#!/bin/bash
 # Creates specified trusted artifacts in an OCI repository
 #
 # The --store parameter is an image reference used to specify the repository, e.g.
@@ -18,8 +18,6 @@
 set -o errexit
 set -o nounset
 set -o pipefail
-
-set -x
 
 tar_opts=-mczf
 if [[ -v DEBUG ]]; then
@@ -67,7 +65,7 @@ for artifact_pair in "${artifact_pairs[@]}"; do
     result_path="${artifact_pair/=*}" # left side
     path="${artifact_pair/*=}" # right side
     artifact_name="$(basename ${result_path})" # right side file name
-    archive_name="${artifact_name}.tgz"
+    archive_name="${artifact_name}.tar.gz"
 
     archive="${archive_dir}/${archive_name}" # in a temp dir create an archive after the file name
 
@@ -85,7 +83,7 @@ for artifact_pair in "${artifact_pairs[@]}"; do
 
     sha256sum_output="$(sha256sum "${archive}")"
     digest="${sha256sum_output/ */}"
-    # echo -n "oci:${repo}@sha256:${digest}" > "${result_path}"
+    echo -n "oci:${repo}@sha256:${digest}" > "${result_path}"
 
     artifacts+=("${archive_name}")
 
