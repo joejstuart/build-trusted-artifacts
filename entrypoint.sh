@@ -78,9 +78,6 @@ case "${op}" in
     "create")
         TIME="${time_format}" time /usr/local/bin/create-archive --store "${store}" "${cmd[@]}"
         ;;
-    "create-oci")
-        TIME="${time_format}" time /usr/local/bin/create-oci-archive --store "${store}" "${cmd[@]}"
-        ;;
     "use")
         TIME="${time_format}" time /usr/local/bin/use-archive --store "${store}" "${cmd[@]}"
         ;;

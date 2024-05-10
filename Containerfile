@@ -2,10 +2,9 @@ FROM scratch AS files
 
 COPY centos9-stream.repo /etc/yum.repos.d/centos9-stream.repo
 COPY RPM-GPG-KEY-centosofficial /etc/pki/rpm-gpg/RPM-GPG-KEY-centosofficial
-COPY create.sh /usr/local/bin/create-archive
-COPY create-oci.sh /usr/local/bin/create-oci-archive
+COPY create-oci.sh /usr/local/bin/create-archive
 COPY select-oci-auth.sh /usr/local/bin/select-oci-auth.sh
-COPY use.sh /usr/local/bin/use-archive
+COPY use-oci.sh /usr/local/bin/use-archive
 COPY entrypoint.sh /usr/local/bin/entrypoint
 COPY LICENSE /licenses/LICENSE
 

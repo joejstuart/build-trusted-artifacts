@@ -62,12 +62,13 @@ artifacts=()
 repo="$(echo -n $store | sed 's_/\(.*\):\(.*\)_/\1_g')"
 
 for artifact_pair in "${artifact_pairs[@]}"; do
-    result_path="${artifact_pair/=*}" # left side
-    path="${artifact_pair/*=}" # right side
-    artifact_name="$(basename ${result_path})" # right side file name
-    archive_name="${artifact_name}.tar.gz"
+    result_path="${artifact_pair/=*}"
+    path="${artifact_pair/*=}"
+    artifact_name="$(basename ${result_path})"
 
-    archive="${archive_dir}/${archive_name}" # in a temp dir create an archive after the file name
+    archive="${archive_dir}/${artifact_name}"
+
+    # log "creating tar archive %s with files from %s" "${archive}" "${path}"
 
     if [ ! -r "${path}" ]; then
         # non-existent paths result in empty archives
@@ -76,7 +77,6 @@ for artifact_pair in "${artifact_pairs[@]}"; do
         # archive the whole directory
         tar "${tar_opts}" "${archive}" -C "${path}" .
     else
-        echo "archiving a single file to ${archive}"
         # archive a single file
         tar "${tar_opts}" "${archive}" -C "${path%/*}" "${path##*/}"
     fi
@@ -85,7 +85,7 @@ for artifact_pair in "${artifact_pairs[@]}"; do
     digest="${sha256sum_output/ */}"
     echo -n "oci:${repo}@sha256:${digest}" > "${result_path}"
 
-    artifacts+=("${archive_name}")
+    artifacts+=("${artifact_name}")
 
     echo Prepared artifact from "${path} (sha256:${digest})"
 done
@@ -104,8 +104,6 @@ if [[ -n  "${IMAGE_EXPIRES_AFTER:-}" ]]; then
 
     config="${config_file}:application/vnd.oci.image.config.v1+json"
 fi
-
-echo 
 
 pushd "${archive_dir}" > /dev/null
 oras push --registry-config <(select-oci-auth.sh ${repo}) "${store}" --config="${config:-}" \
